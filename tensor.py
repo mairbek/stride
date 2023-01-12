@@ -7,7 +7,7 @@ accessor = slice | int
 
 
 class Tensor:
-    def __init__(self, storage: Storage, sizes: tuple[int, int], strides: tuple[int, int], offset: int = 0) -> None:
+    def __init__(self, storage: Storage, sizes: tuple[int, ...], strides: tuple[int, ...], offset: int = 0) -> None:
         self.storage = storage
         self.sizes = sizes
         self.strides = strides
@@ -18,11 +18,11 @@ class Tensor:
             idx = [idx,]
         if isinstance(idx, tuple):
             idx = list(idx)
-        if len(idx) == 1:
-            idx.append(slice(0, self.sizes[1]))
-        if len(idx) != 2:
+        for i in range(len(idx), len(self.sizes)):
+            idx.append(slice(0, self.sizes[i]))
+        if len(idx) != len(self.sizes):
             raise ValueError("Invalid index")
-        for i in range(2):
+        for i in range(len(self.sizes)):
             if isinstance(idx[i], int):
                 idx[i] = slice(idx[i], idx[i] + 1)
         return tuple(idx)
