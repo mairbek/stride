@@ -72,6 +72,22 @@ def test_as_strided_1d_to_2d():
                                              [8,  9, 10]]
 
 
+def test_as_strided_3d_to_2d():
+    a = reshape(list(range(1, 13)), (3, 2, 2))
+    assert as_strided(a, (4, 1), (3, 4)) == [[1,  2,  3,  4],
+                                             [5,  6,  7,  8],
+                                             [9, 10, 11, 12]]
+
+
+def test_as_strided_1d_to_3d():
+    # Reshape 1D array to 3D array
+    a = list(range(1, 13))
+    assert as_strided(a, (6, 3, 1), (2, 2, 3)) == [[[1,  2,  3],
+                                                    [4,  5,  6]],
+                                                   [[7,  8,  9],
+                                                    [10, 11, 12]]]
+
+
 def test_reshape():
     flat = list(range(0, 4))
     a2d = reshape(flat, (2, 2))
