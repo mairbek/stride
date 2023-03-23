@@ -1,5 +1,8 @@
-# TODO better name
-class StridedShape(object):
+from functools import reduce
+from operator import mul
+
+
+class View(object):
     def __init__(self, offset, stride, shape):
         self.offset = offset
         self.stride = stride
@@ -9,17 +12,16 @@ class StridedShape(object):
 class LazyArray(object):
     """docstring for LazyArray."""
 
-    def __init__(self, flat, strided_shape):
+    def __init__(self, flat, view):
         super(LazyArray, self).__init__()
         self.flat = flat
-        self.strided_shape = strided_shape
+        self.view = view
 
     @property
     def shape(self):
-        return self.strided_shape.shape
+        return self.view.shape
 
     def __getitem__(self, idx) -> int:
-        print(idx)
         if isinstance(idx, int):
             idx = (idx,)
         assert len(idx) == len(self.shape)
@@ -28,20 +30,22 @@ class LazyArray(object):
         # TODO oneliner
         flat_idx = list(idx)
         for i in range(len(idx)):
-            flat_idx[i] = self.strided_shape.offset[i] + self.strided_shape.stride[i] * flat_idx[i]
+            flat_idx[i] = self.view.offset[i] + \
+                self.view.stride[i] * flat_idx[i]
         flat_idx = sum(flat_idx)
         return self.flat[flat_idx]
 
     def reshape(self, shape):
-        # TODO: check if the shape is compatible
-        # TODO move reshape calculation to StridedShape
-        strides = [self.strided_shape.stride[-1]]
+        total_shape = reduce(mul, shape)
+        total_view_shape = reduce(mul, self.view.shape)
+        assert total_shape == total_view_shape
+        strides = [0] * len(shape)
+        strides[-1] = self.view.stride[-1]
         for i in range(len(shape)-1, 0, -1):
-            # TODO prealloc why append?
-            strides.append(strides[-1]*shape[i])
-        strides = strides[::-1]
-        offset = self.strided_shape.offset
-        return LazyArray(self.flat, StridedShape(offset, strides, shape))
+            strides[i-1] = strides[i] * shape[i]
+        offset = self.view.offset
+        return LazyArray(self.flat, View(offset, strides, shape))
+
 
 def lazy_range(start, stop, shape):
     flat = list(range(start, stop))
@@ -50,5 +54,5 @@ def lazy_range(start, stop, shape):
     for i in range(len(shape)-1, 0, -1):
         strides.append(strides[-1]*shape[i])
     strides = strides[::-1]
-    stride = StridedShape(offset, strides, shape)
+    stride = View(offset, strides, shape)
     return LazyArray(flat, stride)
