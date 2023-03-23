@@ -27,12 +27,10 @@ class LazyArray(object):
         assert len(idx) == len(self.shape)
         for i, s in zip(idx, self.shape):
             assert i < s
-        # TODO oneliner
-        flat_idx = list(idx)
+        flat_idx = 0
         for i in range(len(idx)):
-            flat_idx[i] = self.view.offset[i] + \
-                self.view.stride[i] * flat_idx[i]
-        flat_idx = sum(flat_idx)
+            flat_idx += self.view.offset[i]
+            flat_idx += self.view.stride[i] * idx[i]
         return self.flat[flat_idx]
 
     def reshape(self, shape):
