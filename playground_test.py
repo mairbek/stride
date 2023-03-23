@@ -1,5 +1,5 @@
 import pytest
-from playground import as_strided, decompose, reshape, flatten
+from playground import as_strided, decompose, reshape, flatten, strided_reshape
 
 
 def test_reshape_precond():
@@ -86,6 +86,31 @@ def test_as_strided_1d_to_3d():
                                                     [4,  5,  6]],
                                                    [[7,  8,  9],
                                                     [10, 11, 12]]]
+
+# Other tests
+
+
+def test_strided_reshape():
+    a = list(range(1,  17))
+    b = strided_reshape(a, (4, 4))
+    print(b)
+    assert b == [[1,  2,  3,  4],
+                 [5,  6,  7,  8],
+                 [9, 10, 11, 12],
+                 [13, 14, 15, 16]]
+    c = strided_reshape(a, (2, 8))
+    assert c == [[1,  2,  3,  4,  5,  6,  7,  8],
+                [9, 10, 11, 12, 13, 14, 15, 16]]
+    d = strided_reshape(b, (2, 8))
+    assert d == [[1,  2,  3,  4,  5,  6,  7,  8],
+                [9, 10, 11, 12, 13, 14, 15, 16]]
+    e = strided_reshape(d, (2, 8))
+    assert e == [[1,  2,  3,  4,  5,  6,  7,  8],
+                [9, 10, 11, 12, 13, 14, 15, 16]]
+    f = strided_reshape(e, (16, ))
+    assert f == a
+    g = strided_reshape(e, (1, 16))
+    assert g == [a]
 
 
 def test_reshape():

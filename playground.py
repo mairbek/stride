@@ -57,3 +57,13 @@ def as_strided(xx, strides, shape):
         result.append(x[idx])
 
     return reshape(result, shape)
+
+def strided_reshape(xx, shape):
+    x = flatten(xx)
+    strides = [1]
+
+    for i in range(len(shape)-1, 0, -1):
+        strides.append(strides[-1]*shape[i])
+    strides = strides[::-1]
+    print("strides", strides)
+    return as_strided(x, strides, shape)
