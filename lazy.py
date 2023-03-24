@@ -11,6 +11,7 @@ class View(object):
     def __repr__(self):
         return f"View(padding={self.padding}, stride={self.stride}, shape={self.shape})"
 
+
 def iter_indices(shape):
     if len(shape) == 0:
         yield ()
@@ -18,6 +19,8 @@ def iter_indices(shape):
     for i in range(shape[0]):
         for j in iter_indices(shape[1:]):
             yield (i,) + j
+
+
 class LazyArray(object):
     """docstring for LazyArray."""
 
@@ -28,12 +31,12 @@ class LazyArray(object):
 
     @property
     def shape(self):
-        return self.view.shape
+        return tuple(self.view.shape)
 
     def __iter__(self):
         for idx in iter_indices(self.shape):
             yield self[idx]
-    
+
     def __eq__(self, other):
         for i, j in zip(self, other):
             if i != j:

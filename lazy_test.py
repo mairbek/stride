@@ -8,7 +8,6 @@ def _test_access():
 
     for i in range(0, 25):
         ii = decompose(i, (5, 5))
-        print("!!", ii, i+1)
         assert a[ii] == i+1
 
 
@@ -18,7 +17,6 @@ def test_access_reshape():
         for j in range(0, 3):
             assert a[i, j] == i*3 + j + 1
     b = a.reshape((3, 2))
-    print("!!!!", b)
     for i in range(0, 3):
         for j in range(0, 2):
             assert b[i, j] == i*2 + j + 1
@@ -92,7 +90,6 @@ def test_slice_in_2d():
     g = a.subrange(((1, 2, 5), (0, 1, 5)))
     h = g.subrange(((0, 1, 2), (1, 2, 5)))
 
-    print(a.view)
     assert as_2d_list(a) == [[0, 1, 2, 3, 4],
                              [5, 6, 7, 8, 9],
                              [10, 11, 12, 13, 14],
@@ -118,7 +115,6 @@ def test_slice_in_2d():
                              [20, 23]]
     assert as_2d_list(g) == [[5, 6, 7, 8, 9],
                              [15, 16, 17, 18, 19]]
-    print(as_2d_list(h))
     assert as_2d_list(h) == [[6, 8],
                              [16, 18]]
 
@@ -132,8 +128,20 @@ def test_slice_in_3d():
     cc = as_3d_list(c)
     assert cc == [[[1, 2, 3]], [[7, 8, 9]]]
 
+
 def test_slicing():
     a = lazy_range(1, 26, (5, 5))
     b = a[0:3, 0:3]
-    print("!!", b.view, b.shape)
-    assert list(b) == [[1, 2, 3], [6, 7, 8], [11, 12, 13]]
+    bb = as_2d_list(b)
+    assert b.shape == (3, 3)
+    assert bb == [[1, 2, 3], [6, 7, 8], [11, 12, 13]]
+
+    c = a[1:4, 1:4]
+    cc = as_2d_list(c)
+    assert c.shape == (3, 3)
+    assert cc == [[7, 8, 9], [12, 13, 14], [17, 18, 19]]
+
+    d = a[0:5:3, 1:5:2]
+    assert d.shape == (2, 2)
+    dd = as_2d_list(d)
+    assert dd == [[2, 4], [17, 19]]
