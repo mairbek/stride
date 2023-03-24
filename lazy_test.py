@@ -2,6 +2,7 @@ import pytest
 from lazy import lazy_range
 from playground import decompose
 
+
 def _test_access():
     a = lazy_range(1, 26, (5, 5))
 
@@ -53,11 +54,13 @@ def test_slice_in_slice():
     ee = as_1d_list(e)
     assert ee == [3, 7]
 
+
 def as_1d_list(larr):
     result = []
     for i in range(larr.shape[0]):
         result.append(larr[i])
     return result
+
 
 def as_2d_list(larr):
     result = []
@@ -66,6 +69,7 @@ def as_2d_list(larr):
         for j in range(larr.shape[1]):
             result[i].append(larr[i, j])
     return result
+
 
 def as_3d_list(larr):
     result = []
@@ -76,8 +80,6 @@ def as_3d_list(larr):
             for k in range(larr.shape[2]):
                 result[i][j].append(larr[i, j, k])
     return result
-
-
 
 
 def test_slice_in_2d():
@@ -130,3 +132,8 @@ def test_slice_in_3d():
     cc = as_3d_list(c)
     assert cc == [[[1, 2, 3]], [[7, 8, 9]]]
 
+def test_slicing():
+    a = lazy_range(1, 26, (5, 5))
+    b = a[0:3, 0:3]
+    print("!!", b.view, b.shape)
+    assert list(b) == [[1, 2, 3], [6, 7, 8], [11, 12, 13]]

@@ -7,10 +7,17 @@ class View(object):
         self.padding = padding
         self.stride = stride
         self.shape = shape
-    
+
     def __repr__(self):
         return f"View(padding={self.padding}, stride={self.stride}, shape={self.shape})"
 
+def iter_indices(shape):
+    if len(shape) == 0:
+        yield ()
+        return
+    for i in range(shape[0]):
+        for j in iter_indices(shape[1:]):
+            yield (i,) + j
 class LazyArray(object):
     """docstring for LazyArray."""
 
@@ -23,14 +30,24 @@ class LazyArray(object):
     def shape(self):
         return self.view.shape
 
+    def __iter__(self):
+        for idx in iter_indices(self.shape):
+            yield self[idx]
+    
+    def __eq__(self, other):
+        for i, j in zip(self, other):
+            if i != j:
+                return False
+        return True
+
     def __getitem__(self, idx) -> int:
         if isinstance(idx, int):
             idx = (idx,)
         assert len(idx) == len(self.shape)
-        for i, s in zip(idx, self.shape):
-            assert i < s
         nidx, all_int = self._normalize_idx(idx)
         if all_int:
+            for i, s in zip(idx, self.shape):
+                assert i < s
             flat_idx = 0
             for i in range(len(idx)):
                 flat_idx += self.view.padding[i]
@@ -38,7 +55,7 @@ class LazyArray(object):
             return self.flat[flat_idx]
         else:
             return self.subrange(nidx)
-    
+
     def _normalize_idx(self, idx):
         result = []
         all_int = True
@@ -50,12 +67,14 @@ class LazyArray(object):
             elif isinstance(ii, int):
                 result.append((ii, 1, ii+1))
             elif isinstance(ii, slice):
-                result.append((ii.start, ii.step, ii.stop))
+                start = ii.start if ii.start is not None else 0
+                step = ii.step if ii.step is not None else 1
+                stop = ii.stop if ii.stop is not None else self.shape[i]
+                result.append((start, step, stop))
                 all_int = False
             else:
                 raise ValueError("Invalid index")
         return result, all_int
-        
 
     def reshape(self, shape):
         total_shape = reduce(mul, shape)
@@ -78,10 +97,13 @@ class LazyArray(object):
         new_view = View([0] * n, [0] * n, [0] * n)
         for i in range(n - 1, -1, -1):
             # TODO validate 1+ logic lol
-            new_view.shape[i] = 1 + (normalized_slices[i][2] - normalized_slices[i][0] - 1) // normalized_slices[i][1]
+            new_view.shape[i] = 1 + (normalized_slices[i][2] -
+                                     normalized_slices[i][0] - 1) // normalized_slices[i][1]
             new_view.stride[i] = self.view.stride[i] * normalized_slices[i][1]
-            new_view.padding[i] = self.view.padding[i] + normalized_slices[i][0] * self.view.stride[i]
+            new_view.padding[i] = self.view.padding[i] + \
+                normalized_slices[i][0] * self.view.stride[i]
         return LazyArray(self.flat, new_view)
+
 
 def lazy_range(start, stop, shape):
     flat = list(range(start, stop))
