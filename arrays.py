@@ -22,6 +22,9 @@ class View(object):
             strides[i-1] = strides[i] * shape[i]
         return View(self.padding, strides, shape)
 
+    def subrange(self, slices):
+        return Array(self.flat, self.view.subrange(slices))
+
 
 class Array(object):
     """docstring for Array."""
