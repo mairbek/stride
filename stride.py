@@ -1,20 +1,10 @@
-from tensor import Storage
-from tensor import Tensor
+from arrays import Array, View
 
-import arrays
+from math import prod
 
-def zeros(n: int, m: int = 1):
-    s = Storage(n * m)
-    return Tensor(s, (n, m), (m, 1))
 
-def zero_array(shape):
-    return arrays.zeros(shape)
-
-def array(payload):
-    return arrays.Array(payload)
-
-def out(arr, ndim):
-    return arrays.out(arr, ndim)
-
-def broadcast_to(arr, shape):
-    return arrays.broacast_to(arr, shape)
+def zeros(shape):
+    dim = prod(shape)
+    flat = [0] * dim
+    view = View(0, (1, ), (dim, ))
+    return Array(flat, view).reshape(shape)

@@ -13,11 +13,11 @@ class View(object):
         return f"View(padding={self.padding}, stride={self.stride}, shape={self.shape})"
 
 
-class LazyArray(object):
-    """docstring for LazyArray."""
+class Array(object):
+    """docstring for Array."""
 
     def __init__(self, flat, view):
-        super(LazyArray, self).__init__()
+        super(Array, self).__init__()
         self.flat = flat
         self.view = view
 
@@ -94,7 +94,7 @@ class LazyArray(object):
         for i in range(len(shape)-1, 0, -1):
             strides[i-1] = strides[i] * shape[i]
         padding = self.view.padding
-        return LazyArray(self.flat, View(padding, strides, shape))
+        return Array(self.flat, View(padding, strides, shape))
 
     def subrange(self, slices):
         n = len(self.shape)
@@ -110,7 +110,7 @@ class LazyArray(object):
                                      normalized_slices[i][0] - 1) // normalized_slices[i][1]
             new_view.stride[i] = self.view.stride[i] * normalized_slices[i][1]
             new_view.padding += normalized_slices[i][0] * self.view.stride[i]
-        return LazyArray(self.flat, new_view)
+        return Array(self.flat, new_view)
 
 
 def lazy_range(start, stop, shape):
@@ -121,4 +121,4 @@ def lazy_range(start, stop, shape):
         strides.append(strides[-1]*shape[i])
     strides = strides[::-1]
     stride = View(padding, strides, shape)
-    return LazyArray(flat, stride)
+    return Array(flat, stride)
