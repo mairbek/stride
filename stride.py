@@ -27,3 +27,7 @@ def array(container):
     flat = list(_flatten(shape, container, 0))
     view = View(0, (1, ), (prod(shape), ))
     return Array(flat, view).reshape(shape)
+
+
+def arange(start, stop):
+    return array(range(start, stop))

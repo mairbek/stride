@@ -1,11 +1,10 @@
 import pytest
-from arrays import lazy_range
-from arrays import View
+import stride as st
 from playground import decompose
 
 
 def _test_access():
-    a = lazy_range(1, 26, (5, 5))
+    a = st.arange(1, 26).reshape(5, 5)
 
     for i in range(0, 25):
         ii = decompose(i, (5, 5))
@@ -13,7 +12,7 @@ def _test_access():
 
 
 def test_access_reshape():
-    a = lazy_range(1, 7, (2, 3))
+    a = st.arange(1, 7).reshape(2, 3)
     for i in range(0, 2):
         for j in range(0, 3):
             assert a[i, j] == i*3 + j + 1
@@ -27,7 +26,7 @@ def test_access_reshape():
 
 
 def test_slice_1d():
-    a = lazy_range(1, 7, (6,))
+    a = st.arange(1, 7)
     b = a.subrange(((1, 1, 4),))
     for i in range(0, 3):
         assert b[i] == i + 2
@@ -38,7 +37,7 @@ def test_slice_1d():
 
 
 def test_slice_in_slice():
-    a = lazy_range(1, 26, (25,))
+    a = st.arange(1, 26)
     b = a.subrange(((1, 1, 8),))
     c = b.subrange(((2, 1, 5),))
 
@@ -82,7 +81,7 @@ def as_3d_list(larr):
 
 
 def test_slice_in_2d():
-    a = lazy_range(0, 25, (5, 5))
+    a = st.arange(0, 25).reshape(5, 5)
     b = a.subrange(((1, 1, 5), (1, 1, 5)))
     c = b.subrange(((1, 1, 4), (1, 1, 4)))
     d = a.subrange(((3, 1, 5), (2, 1, 4)))
@@ -121,7 +120,7 @@ def test_slice_in_2d():
 
 
 def test_slice_in_3d():
-    a = lazy_range(1, 13, (2, 2, 3))
+    a = st.arange(1, 13).reshape(2, 2, 3)
     b = a.subrange(((0, 2, 2), (0, 1, 2), (0, 1, 3)))
     c = a.subrange(((0, 1, 2), (0, 2, 2), (0, 1, 3)))
     bb = as_3d_list(b)
@@ -131,7 +130,7 @@ def test_slice_in_3d():
 
 
 def test_slicing():
-    a = lazy_range(1, 26, (5, 5))
+    a = st.arange(1, 26).reshape(5, 5)
     b = a[0:3, 0:3]
     bb = as_2d_list(b)
     assert b.shape == (3, 3)
@@ -149,7 +148,7 @@ def test_slicing():
 
 
 def test_unwrap():
-    a = lazy_range(1, 26, (5, 5))
+    a = st.arange(1, 26).reshape(5, 5)
     b = a[1]
     assert b.shape == (5,)
     bb = as_1d_list(b)
@@ -165,26 +164,26 @@ def test_unwrap():
 
 
 def test_ndindex():
-    a = lazy_range(1, 5, (2, 2))
+    a = st.arange(1, 5).reshape(2, 2)
     b = list(a.ndindex())
     assert b == [(0, 0), (0, 1), (1, 0), (1, 1)]
 
 
 def test_ndenumerate():
-    a = lazy_range(1, 5, (2, 2))
+    a = st.arange(1, 5).reshape(2, 2)
     b = list(a.ndenumerate())
     print(b)
     assert b == [((0, 0), 1), ((0, 1), 2), ((1, 0), 3), ((1, 1), 4)]
 
 
 def test_1d_iter():
-    a = lazy_range(1, 5, shape=(4,))
+    a = st.arange(1, 5)
     for i, j in zip(a, range(1, 5)):
         assert i == j
 
 
 def test_2d_iter():
-    a = lazy_range(1, 10, shape=(3, 3))
+    a = st.arange(1, 10).reshape(3, 3)
     for i, j in zip(a, range(0, 4)):
         assert i.shape == (3, )
         assert as_1d_list(i) == [1 + j*3 + k for k in range(0, 3)]

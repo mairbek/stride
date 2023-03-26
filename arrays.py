@@ -99,7 +99,10 @@ class Array(object):
                 raise ValueError("Invalid index")
         return result
 
-    def reshape(self, shape):
+    def reshape(self, *arg):
+        shape = arg
+        if isinstance(arg[0], (list, tuple)):
+            shape = arg[0]
         return Array(self.flat, self.view.reshape(shape))
 
     def subrange(self, slices):
