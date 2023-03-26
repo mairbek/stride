@@ -27,7 +27,14 @@ class LazyArray(object):
 
     def ndindex(self):
         return itertools.product(*[range(i) for i in self.shape])
-        
+
+    def ndenumerate(self):
+        for idx in self.ndindex():
+            flat_idx = 0
+            for i in range(len(idx)):
+                flat_idx += self.view.stride[i] * idx[i]
+            flat_idx += self.view.padding
+            yield idx, self.flat[flat_idx]
 
     def __eq__(self, other):
         for i, j in zip(self, other):

@@ -167,3 +167,9 @@ def test_ndindex():
     a = lazy_range(1, 5, (2, 2))
     b = list(a.ndindex())
     assert b == [(0, 0), (0, 1), (1, 0), (1, 1)]
+
+def test_ndenumerate():
+    a = lazy_range(1, 5, (2, 2))
+    b = list(a.ndenumerate())
+    print(b)
+    assert b == [((0, 0), 1), ((0, 1), 2), ((1, 0), 3), ((1, 1), 4)]
