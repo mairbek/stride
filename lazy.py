@@ -35,6 +35,11 @@ class LazyArray(object):
                 flat_idx += self.view.stride[i] * idx[i]
             flat_idx += self.view.padding
             yield idx, self.flat[flat_idx]
+    
+    def __iter__(self):
+        for i in range(self.shape[0]):
+            # don't unwrap the view
+            yield self[i]
 
     def __eq__(self, other):
         for i, j in zip(self, other):

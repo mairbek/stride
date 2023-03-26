@@ -163,13 +163,28 @@ def test_unwrap():
     assert d == 7
     assert d == e
 
+
 def test_ndindex():
     a = lazy_range(1, 5, (2, 2))
     b = list(a.ndindex())
     assert b == [(0, 0), (0, 1), (1, 0), (1, 1)]
+
 
 def test_ndenumerate():
     a = lazy_range(1, 5, (2, 2))
     b = list(a.ndenumerate())
     print(b)
     assert b == [((0, 0), 1), ((0, 1), 2), ((1, 0), 3), ((1, 1), 4)]
+
+
+def test_1d_iter():
+    a = lazy_range(1, 5, shape=(4,))
+    for i, j in zip(a, range(1, 5)):
+        assert i == j
+
+
+def test_2d_iter():
+    a = lazy_range(1, 10, shape=(3, 3))
+    for i, j in zip(a, range(0, 4)):
+        assert i.shape == (3, )
+        assert as_1d_list(i) == [1 + j*3 + k for k in range(0, 3)]
