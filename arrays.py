@@ -42,6 +42,7 @@ class Array(object):
             yield self[i]
 
     def __eq__(self, other):
+        # TODO only works for 1d arrays!
         for i, j in zip(self, other):
             if i != j:
                 return False

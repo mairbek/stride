@@ -1,6 +1,6 @@
 import pytest
-from lazy import lazy_range
-from lazy import View
+from arrays import lazy_range
+from arrays import View
 from playground import decompose
 
 
