@@ -162,3 +162,8 @@ def test_unwrap():
     e = a[1][1]
     assert d == 7
     assert d == e
+
+def test_ndindex():
+    a = lazy_range(1, 5, (2, 2))
+    b = list(a.ndindex())
+    assert b == [(0, 0), (0, 1), (1, 0), (1, 1)]

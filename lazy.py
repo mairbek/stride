@@ -1,5 +1,6 @@
 from functools import reduce
 from operator import mul
+import itertools
 
 
 class View(object):
@@ -10,15 +11,6 @@ class View(object):
 
     def __repr__(self):
         return f"View(padding={self.padding}, stride={self.stride}, shape={self.shape})"
-
-
-def iter_indices(shape):
-    if len(shape) == 0:
-        yield ()
-        return
-    for i in range(shape[0]):
-        for j in iter_indices(shape[1:]):
-            yield (i,) + j
 
 
 class LazyArray(object):
@@ -33,9 +25,9 @@ class LazyArray(object):
     def shape(self):
         return tuple(self.view.shape)
 
-    def __iter__(self):
-        for idx in iter_indices(self.shape):
-            yield self[idx]
+    def ndindex(self):
+        return itertools.product(*[range(i) for i in self.shape])
+        
 
     def __eq__(self, other):
         for i, j in zip(self, other):
