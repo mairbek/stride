@@ -26,6 +26,19 @@ class View(object):
         return Array(self.flat, self.view.subrange(slices))
 
 
+def _ndenumerate(idx, container, depth):
+    if depth >= len(idx):
+        return None
+    for i in container:
+        if isinstance(i, (list, tuple)):
+            new_idx = idx[:]
+            for j in _ndenumerate(new_idx, i, depth+1):
+                yield j
+        else:
+            yield tuple(idx), i
+        idx[depth] += 1
+
+
 class Array(object):
     """docstring for Array."""
 
@@ -54,9 +67,18 @@ class Array(object):
             # don't unwrap the view
             yield self[i]
 
-    def __eq__(self, other):
-        # TODO only works for 1d arrays!
-        for i, j in zip(self, other):
+    def __eq__(self, arg):
+        if isinstance(arg, (list, tuple)):
+            other = _ndenumerate([0]*len(self.shape), arg, 0)
+        elif isinstance(arg, Array):
+            if self.shape != arg.shape:
+                return False
+            other = arg.ndenumerate()
+        else:
+            return False
+        if other is None:
+            return False
+        for i, j in zip(self.ndenumerate(), other):
             if i != j:
                 return False
         return True
