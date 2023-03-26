@@ -1,5 +1,6 @@
 import pytest
 from lazy import lazy_range
+from lazy import View
 from playground import decompose
 
 
@@ -145,3 +146,19 @@ def test_slicing():
     assert d.shape == (2, 2)
     dd = as_2d_list(d)
     assert dd == [[2, 4], [17, 19]]
+
+
+def test_unwrap():
+    a = lazy_range(1, 26, (5, 5))
+    b = a[1]
+    assert b.shape == (5,)
+    bb = as_1d_list(b)
+    assert bb == [6, 7, 8, 9, 10]
+    c = a[:, 1]
+    assert c.shape == (5,)
+    cc = as_1d_list(a[:, 1])
+    assert cc == [2, 7, 12, 17, 22]
+    d = a[1, 1]
+    e = a[1][1]
+    assert d == 7
+    assert d == e
