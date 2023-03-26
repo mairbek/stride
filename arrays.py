@@ -12,6 +12,16 @@ class View(object):
     def __repr__(self):
         return f"View(padding={self.padding}, stride={self.stride}, shape={self.shape})"
 
+    def reshape(self, shape):
+        total_shape = reduce(mul, shape)
+        total_view_shape = reduce(mul, self.shape)
+        assert total_shape == total_view_shape
+        strides = [0] * len(shape)
+        strides[-1] = self.stride[-1]
+        for i in range(len(shape)-1, 0, -1):
+            strides[i-1] = strides[i] * shape[i]
+        return View(self.padding, strides, shape)
+
 
 class Array(object):
     """docstring for Array."""
@@ -35,7 +45,7 @@ class Array(object):
                 flat_idx += self.view.stride[i] * idx[i]
             flat_idx += self.view.padding
             yield idx, self.flat[flat_idx]
-    
+
     def __iter__(self):
         for i in range(self.shape[0]):
             # don't unwrap the view
@@ -87,15 +97,7 @@ class Array(object):
         return result
 
     def reshape(self, shape):
-        total_shape = reduce(mul, shape)
-        total_view_shape = reduce(mul, self.view.shape)
-        assert total_shape == total_view_shape
-        strides = [0] * len(shape)
-        strides[-1] = self.view.stride[-1]
-        for i in range(len(shape)-1, 0, -1):
-            strides[i-1] = strides[i] * shape[i]
-        padding = self.view.padding
-        return Array(self.flat, View(padding, strides, shape))
+        return Array(self.flat, self.view.reshape(shape))
 
     def subrange(self, slices):
         n = len(self.shape)
