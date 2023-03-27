@@ -1,14 +1,5 @@
 import pytest
 import stride as st
-from playground import decompose
-
-
-def _test_access():
-    a = st.arange(1, 26).reshape(5, 5)
-
-    for i in range(0, 25):
-        ii = decompose(i, (5, 5))
-        assert a[ii] == i+1
 
 
 def test_access_reshape():
