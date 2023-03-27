@@ -25,14 +25,20 @@ class View(object):
     def subrange(self, slices):
         return Array(self.flat, self.view.subrange(slices))
 
+    def flat_idx(self, idx):
+        result = 0
+        for i in range(len(idx)):
+            result += self.stride[i] * idx[i]
+        result += self.padding
+        return result
+
 
 def _ndenumerate(idx, container, depth):
     if depth >= len(idx):
         return None
     for i in container:
         if isinstance(i, (list, tuple)):
-            new_idx = idx[:]
-            for j in _ndenumerate(new_idx, i, depth+1):
+            for j in _ndenumerate(idx[:], i, depth+1):
                 yield j
         else:
             yield tuple(idx), i
@@ -56,11 +62,8 @@ class Array(object):
 
     def ndenumerate(self):
         for idx in self.ndindex():
-            flat_idx = 0
-            for i in range(len(idx)):
-                flat_idx += self.view.stride[i] * idx[i]
-            flat_idx += self.view.padding
-            yield idx, self.flat[flat_idx]
+            fi = self.view.flat_idx(idx)
+            yield idx, self.flat[fi]
 
     def __iter__(self):
         for i in range(self.shape[0]):
@@ -121,6 +124,26 @@ class Array(object):
                 raise ValueError("Invalid index")
         return result
 
+    def _run_to_list(self, acc, idx, depth):
+        new_idx = idx[:]
+        new_idx.append(0)
+        if depth == len(self.shape) - 1:
+            for i in range(self.shape[depth]):
+                new_idx[-1] = i
+                fi = self.view.flat_idx(new_idx)
+                acc.append(self.flat[fi])
+            return
+        for i in range(self.shape[depth]):
+            new_idx[-1] = i
+            ptr = []
+            acc.append(ptr)
+            self._run_to_list(ptr, new_idx[:], depth+1)
+
+    def to_list(self):
+        acc = []
+        self._run_to_list(acc, [], depth=0)
+        return acc
+
     def reshape(self, *arg):
         shape = arg
         if isinstance(arg[0], (list, tuple)):
@@ -143,13 +166,5 @@ class Array(object):
             new_view.padding += normalized_slices[i][0] * self.view.stride[i]
         return Array(self.flat, new_view)
 
-
-def lazy_range(start, stop, shape):
-    flat = list(range(start, stop))
-    padding = 0
-    strides = [1]
-    for i in range(len(shape)-1, 0, -1):
-        strides.append(strides[-1]*shape[i])
-    strides = strides[::-1]
-    stride = View(padding, strides, shape)
-    return Array(flat, stride)
+    def __repr__(self):
+        return f"stride.array({self.to_list()})"

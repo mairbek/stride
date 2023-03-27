@@ -188,6 +188,7 @@ def test_2d_iter():
         assert i.shape == (3, )
         assert as_1d_list(i) == [1 + j*3 + k for k in range(0, 3)]
 
+
 def test_1d_equals():
     a = st.arange(1, 5)
     b = [1, 2, 3, 4]
@@ -197,6 +198,7 @@ def test_1d_equals():
     d = st.arange(1, 5)
     assert a == d
 
+
 def test_2d_equals():
     a = st.arange(1, 10).reshape(3, 3)
     b = st.arange(1, 10).reshape(3, 3)
@@ -205,3 +207,12 @@ def test_2d_equals():
     assert a == c
     d = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     assert a != d
+
+
+def test_to_list():
+    a = st.arange(1, 4)
+    assert a.to_list() == [1, 2, 3]
+    a = st.arange(1, 10).reshape((3, 3))
+    assert a.to_list() == [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    a = st.arange(1, 13).reshape(2, 2, 3)
+    assert a.to_list() == [[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]]
