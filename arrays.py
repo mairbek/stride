@@ -33,7 +33,7 @@ class View(object):
         for i in range(n - 1, -1, -1):
             # TODO validate 1+ logic lol
             result.shape[i] = 1 + (normalized_slices[i][2] -
-                                     normalized_slices[i][0] - 1) // normalized_slices[i][1]
+                                   normalized_slices[i][0] - 1) // normalized_slices[i][1]
             result.stride[i] = self.stride[i] * normalized_slices[i][1]
             result.padding += normalized_slices[i][0] * self.stride[i]
         return result
@@ -165,6 +165,6 @@ class Array(object):
 
     def subrange(self, slices):
         return Array(self.flat, self.view.subrange(slices))
-        
+
     def __repr__(self):
         return f"array({self.to_list()})"

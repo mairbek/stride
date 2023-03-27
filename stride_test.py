@@ -17,3 +17,11 @@ def test_array():
     assert a.shape == (2, 3)
     assert a[0] == [1, 2, 3]
     assert a[1] == [4, 5, 6]
+
+def test_complex():
+    # TODO fix
+    a = st.arange(1, 26).reshape(5, 5)
+    b = a[1:4, 1:4]
+    assert b.shape == (3, 3)
+    c = b.reshape((9,))
+    assert c == [7, 8, 9, 12, 13, 14, 17, 18, 19]
