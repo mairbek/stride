@@ -23,7 +23,20 @@ class View(object):
         return View(self.padding, strides, shape)
 
     def subrange(self, slices):
-        return Array(self.flat, self.view.subrange(slices))
+        n = len(self.shape)
+        assert len(slices) == n
+        normalized_slices = list(slices)
+        for i in range(n):
+            if slices[i] is None:
+                normalized_slices[i] = slice(0, 1, self.shape[i])
+        result = View(self.padding, [0] * n, [0] * n)
+        for i in range(n - 1, -1, -1):
+            # TODO validate 1+ logic lol
+            result.shape[i] = 1 + (normalized_slices[i][2] -
+                                     normalized_slices[i][0] - 1) // normalized_slices[i][1]
+            result.stride[i] = self.stride[i] * normalized_slices[i][1]
+            result.padding += normalized_slices[i][0] * self.stride[i]
+        return result
 
     def flat_idx(self, idx):
         result = 0
@@ -151,20 +164,7 @@ class Array(object):
         return Array(self.flat, self.view.reshape(shape))
 
     def subrange(self, slices):
-        n = len(self.shape)
-        assert len(slices) == n
-        normalized_slices = list(slices)
-        for i in range(n):
-            if slices[i] is None:
-                normalized_slices[i] = slice(0, 1, self.shape[i])
-        new_view = View(self.view.padding, [0] * n, [0] * n)
-        for i in range(n - 1, -1, -1):
-            # TODO validate 1+ logic lol
-            new_view.shape[i] = 1 + (normalized_slices[i][2] -
-                                     normalized_slices[i][0] - 1) // normalized_slices[i][1]
-            new_view.stride[i] = self.view.stride[i] * normalized_slices[i][1]
-            new_view.padding += normalized_slices[i][0] * self.view.stride[i]
-        return Array(self.flat, new_view)
-
+        return Array(self.flat, self.view.subrange(slices))
+        
     def __repr__(self):
         return f"array({self.to_list()})"
