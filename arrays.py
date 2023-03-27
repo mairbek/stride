@@ -167,4 +167,4 @@ class Array(object):
         return Array(self.flat, new_view)
 
     def __repr__(self):
-        return f"stride.array({self.to_list()})"
+        return f"array({self.to_list()})"

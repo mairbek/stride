@@ -205,5 +205,15 @@ def test_to_list():
     assert a.to_list() == [1, 2, 3]
     a = st.arange(1, 10).reshape((3, 3))
     assert a.to_list() == [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    assert a[1:, 1:].to_list() == [[5, 6], [8, 9]]
     a = st.arange(1, 13).reshape(2, 2, 3)
     assert a.to_list() == [[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]]
+
+
+def test_repr():
+    a = st.arange(1, 4)
+    assert repr(a) == "array([1, 2, 3])"
+    a = st.arange(1, 10).reshape((3, 3))
+    assert repr(a) == "array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])"
+    a = st.arange(1, 13).reshape(2, 2, 3)
+    assert repr(a) == "array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])"
